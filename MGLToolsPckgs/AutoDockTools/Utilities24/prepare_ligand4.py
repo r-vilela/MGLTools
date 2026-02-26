@@ -1,21 +1,19 @@
 #!/usr/bin/env python
 #
-# 
+#
 #
 # $Header: /mnt/raid/services/cvs/python/packages/share1.5/AutoDockTools/Utilities24/prepare_ligand4.py,v 1.10.4.1 2015/08/26 22:45:31 sanner Exp $
 #
-import os 
+import os
 
 from MolKit import Read
 
 from AutoDockTools.MoleculePreparation import AD4LigandPreparation
 
 
-
 if __name__ == '__main__':
     import sys
     import getopt
-
 
     def usage():
         "Print helpful, accurate usage statement to stdout."
@@ -53,221 +51,240 @@ if __name__ == '__main__':
 
     # process command arguments
     try:
-        opt_list, args = getopt.getopt(sys.argv[1:], 'l:vo:d:A:Cp:U:B:R:MFI:Zgswh')
+        opt_list, args = getopt.getopt(
+            sys.argv[1:], 'l:vo:d:A:Cp:U:B:R:MFI:Zgswh')
     except getopt.GetoptError, msg:
-        print 'prepare_ligand4.py: %s' %msg
+        print 'prepare_ligand4.py: %s' % msg
         usage()
         sys.exit(2)
 
     # initialize required parameters
-    #-l: ligand
-    ligand_filename =  None
+    # -l: ligand
+    ligand_filename = None
     # optional parameters
     verbose = None
     add_bonds = False
-    #-A: repairs to make: add bonds and/or hydrogens
+    # -A: repairs to make: add bonds and/or hydrogens
     repairs = ""
-    #-C  default: add gasteiger charges 
+    # -C  default: add gasteiger charges
     charges_to_add = 'gasteiger'
-    #-p preserve charges on specific atom types
-    preserve_charge_types=''
-    #-U: cleanup by merging nphs_lps, nphs, lps
-    cleanup  = "nphs_lps"
-    #-B named rotatable bond type(s) to allow to rotate
-    #allowed_bonds = ""
+    # -p preserve charges on specific atom types
+    preserve_charge_types = ''
+    # -U: cleanup by merging nphs_lps, nphs, lps
+    cleanup = "nphs_lps"
+    # -B named rotatable bond type(s) to allow to rotate
+    # allowed_bonds = ""
     allowed_bonds = "backbone"
-    #-r  root
+    # -r  root
     root = 'auto'
-    #-o outputfilename
+    # -o outputfilename
     outputfilename = None
-    #-F check_for_fragments
+    # -F check_for_fragments
     check_for_fragments = False
-    #-I bonds_to_inactivate
+    # -I bonds_to_inactivate
     bonds_to_inactivate = ""
-    #-Z inactivate_all_torsions
+    # -Z inactivate_all_torsions
     inactivate_all_torsions = False
-    #-g attach_nonbonded_fragments
+    # -g attach_nonbonded_fragments
     attach_nonbonded_fragments = False
-    #-s attach_nonbonded_singletons
+    # -s attach_nonbonded_singletons
     attach_singletons = False
-    #-w assign_unique_names 
-    assign_unique_names = False       
-    #-m mode 
+    # -w assign_unique_names
+    assign_unique_names = False
+    # -m mode
     mode = 'automatic'
-    #-d dictionary
+    # -d dictionary
     dict = None
 
-    #'l:vo:d:A:CKU:B:R:MFI:Zgs'
+    # 'l:vo:d:A:CKU:B:R:MFI:Zgs'
     for o, a in opt_list:
-        #print "o=", o, " a=", a
+        # print "o=", o, " a=", a
         if o in ('-l', '--l'):
-            #ligand_filename = a
+            # ligand_filename = a
             ligand_filename = a
-            if verbose: print 'set ligand_filename to ', a
-            ligand_ext = os.path.splitext(os.path.basename(a))[1] # eg .mol2  
+            if verbose:
+                print 'set ligand_filename to ', a
+            ligand_ext = os.path.splitext(os.path.basename(a))[1]  # eg .mol2
         if o in ('-v', '--v'):
             verbose = True
-            if verbose: print 'set verbose to ', True
+            if verbose:
+                print 'set verbose to ', True
         if o in ('-o', '--o'):
             outputfilename = a
-            if verbose: print 'set outputfilename to ', a
+            if verbose:
+                print 'set outputfilename to ', a
         if o in ('-d', '--d'):
             dict = a
-            if verbose: print 'set dict to ', a
+            if verbose:
+                print 'set dict to ', a
         if o in ('-A', '--A'):
             repairs = a
-            if verbose: print 'set repairs to ', a
+            if verbose:
+                print 'set repairs to ', a
         if o in ('-C', '--C'):
             charges_to_add = None
-            if verbose: print 'do not add charges'
+            if verbose:
+                print 'do not add charges'
         if o in ('-p', '--p'):
             # case1: single character
             # examples of 1 character element AND 1 character autodock element: B,C,N,O,F,P,S
             # examples of 2 character autodock elements: NA, HD, OA, SA
-            #------
-            # case2: 2 characters 
+            # ------
+            # case2: 2 characters
             # examples of 2 character element and two character autodock elements:
             # case2a: Zn, Na
-            #ONLY VALID if ligand_ext in [".pdbqt", ".mol2"]
+            # ONLY VALID if ligand_ext in [".pdbqt", ".mol2"]
             if ligand_ext in ['.mol2']:
-                if preserve_charge_types =='':
+                if preserve_charge_types == '':
                     if a.find(',') == -1:
                         preserve_charge_types = a
                     else:
                         preserve_charge_types = []
                         for subT in a.split(','):
                             preserve_charge_types.append(subT)
-            if verbose: print 'preserve initial charges on ', preserve_charge_types
+            if verbose:
+                print 'preserve initial charges on ', preserve_charge_types
         if o in ('-U', '--U'):
-            cleanup  = a
-            if verbose: print 'set cleanup to merge ', a
+            cleanup = a
+            if verbose:
+                print 'set cleanup to merge ', a
         if o in ('-B', '--B'):
             allowed_bonds = a
-            if verbose: print 'allow ', a, 'bonds set to rotate'
+            if verbose:
+                print 'allow ', a, 'bonds set to rotate'
         if o in ('-R', '--R'):
             root = a
-            if verbose: print 'set root to ', root
+            if verbose:
+                print 'set root to ', root
         if o in ('-F', '--F'):
             check_for_fragments = True
-            if verbose: print 'set check_for_fragments to True'
+            if verbose:
+                print 'set check_for_fragments to True'
         if o in ('-M', '--M'):
             mode = a
-            if verbose: print 'set mode to ', a
+            if verbose:
+                print 'set mode to ', a
         if o in ('-I', '--I'):
             bonds_to_inactivate = a
-            if verbose: print 'set bonds_to_inactivate to ', a
+            if verbose:
+                print 'set bonds_to_inactivate to ', a
         if o in ('-Z', '--Z'):
             inactivate_all_torsions = True
-            if verbose: print 'set inactivate_all_torsions to ', inactivate_all_torsions
+            if verbose:
+                print 'set inactivate_all_torsions to ', inactivate_all_torsions
         if o in ('-g', '--g'):
             attach_nonbonded_fragments = True
-            if verbose: print 'set attach_nonbonded_fragments to ', attach_nonbonded_fragments
+            if verbose:
+                print 'set attach_nonbonded_fragments to ', attach_nonbonded_fragments
         if o in ('-s', '--s'):
             attach_singletons = True
-            if verbose: print 'set attach_singletons to ', attach_singletons
+            if verbose:
+                print 'set attach_singletons to ', attach_singletons
         if o in ('-w', '--w'):
             assign_unique_names = True
-            if verbose: print 'set assign_unique_names to ', assign_unique_names, ' newname is original name plus its index(1-based'
+            if verbose:
+                print 'set assign_unique_names to ', assign_unique_names, ' newname is original name plus its index(1-based'
         if o in ('-h', '--'):
             usage()
             sys.exit()
 
-
-    if not  ligand_filename:
+    if not ligand_filename:
         print 'prepare_ligand4: ligand filename must be specified.'
         usage()
         sys.exit()
 
     if attach_singletons:
         attach_nonbonded_fragments = True
-        if verbose: print "using attach_singletons so attach_nonbonded_fragments also"
-    
+        if verbose:
+            print "using attach_singletons so attach_nonbonded_fragments also"
+
     mols = Read(ligand_filename)
-    if verbose: print 'read ', ligand_filename
+    if verbose:
+        print 'read ', ligand_filename
     mol = mols[0]
-    if len(mols)>1:
-        if verbose: 
+    if len(mols) > 1:
+        if verbose:
             print "more than one molecule in file"
-        #use the one molecule with the most atoms
+        # use the one molecule with the most atoms
         ctr = 1
         for m in mols[1:]:
             ctr += 1
-            if len(m.allAtoms)>len(mol.allAtoms):
+            if len(m.allAtoms) > len(mol.allAtoms):
                 mol = m
                 if verbose:
                     print "mol set to ", ctr, "th molecule with", len(mol.allAtoms), "atoms"
     coord_dict = {}
-    for a in mol.allAtoms: coord_dict[a] = a.coords
+    for a in mol.allAtoms:
+        coord_dict[a] = a.coords
     if assign_unique_names:  # added to simplify setting up covalent dockings 8/2014
         for at in mol.allAtoms:
-            if mol.allAtoms.get(at.name) >1:
-                at.name = at.name + str(at._uniqIndex +1)
+            if mol.allAtoms.get(at.name) > 1:
+                at.name = at.name + str(at._uniqIndex + 1)
         if verbose:
-            print "renamed %d atoms: each newname is the original name of the atom plus its (1-based) uniqIndex" %(len(mol.allAtoms))
+            print "renamed %d atoms: each newname is the original name of the atom plus its (1-based) uniqIndex" % (len(mol.allAtoms))
 
     mol.buildBondsByDistance()
     if charges_to_add is not None:
         preserved = {}
-        preserved_types = preserve_charge_types.split(',') 
+        preserved_types = preserve_charge_types.split(',')
         for t in preserved_types:
-            if not len(t): continue
+            if not len(t):
+                continue
             try:
-                ats = mol.allAtoms.get(lambda x: x.autodock_element==t)
+                ats = mol.allAtoms.get(lambda x: x.autodock_element == t)
                 for a in ats:
                     if a.chargeSet is not None:
                         preserved[a] = [a.chargeSet, a.charge]
             except AttributeError:
-                ats = mol.allAtoms.get(lambda x: x.element==t)
+                ats = mol.allAtoms.get(lambda x: x.element == t)
                 for a in ats:
                     if a.chargeSet is not None:
                         preserved[a] = [a.chargeSet, a.charge]
-            print " preserved = ", 
+            print " preserved = ",
             for key, val in preserved.items():
                 print "key=", key
                 print "val =", val
-           
 
     if verbose:
         print "setting up LPO with mode=", mode,
         print "and outputfilename= ", outputfilename
         print "and check_for_fragments=", check_for_fragments
         print "and bonds_to_inactivate=", bonds_to_inactivate
-    LPO = AD4LigandPreparation(mol, mode, repairs, charges_to_add, 
-                            cleanup, allowed_bonds, root, 
-                            outputfilename=outputfilename,
-                            dict=dict, check_for_fragments=check_for_fragments,
-                            bonds_to_inactivate=bonds_to_inactivate, 
-                            inactivate_all_torsions=inactivate_all_torsions,
-                            attach_nonbonded_fragments=attach_nonbonded_fragments,
-                            attach_singletons=attach_singletons)
-    #do something about atoms with too many bonds (?)
-    #FIX THIS: could be peptide ligand (???)
+    LPO = AD4LigandPreparation(mol, mode, repairs, charges_to_add,
+                               cleanup, allowed_bonds, root,
+                               outputfilename=outputfilename,
+                               dict=dict, check_for_fragments=check_for_fragments,
+                               bonds_to_inactivate=bonds_to_inactivate,
+                               inactivate_all_torsions=inactivate_all_torsions,
+                               attach_nonbonded_fragments=attach_nonbonded_fragments,
+                               attach_singletons=attach_singletons)
+    # do something about atoms with too many bonds (?)
+    # FIX THIS: could be peptide ligand (???)
     #          ??use isPeptide to decide chargeSet??
     if charges_to_add is not None:
-        #restore any previous charges
+        # restore any previous charges
         for atom, chargeList in preserved.items():
             atom._charges[chargeList[0]] = chargeList[1]
             atom.chargeSet = chargeList[0]
-            if verbose: print "set charge on ", atom.full_name(), " to ", atom.charge
-    if verbose: print "returning ", mol.returnCode 
+            if verbose:
+                print "set charge on ", atom.full_name(), " to ", atom.charge
+    if verbose:
+        print "returning ", mol.returnCode
     bad_list = []
     for a in mol.allAtoms:
-        if a in coord_dict.keys() and a.coords!=coord_dict[a]: 
+        if a in coord_dict.keys() and a.coords != coord_dict[a]:
             bad_list.append(a)
     if len(bad_list):
-        print len(bad_list), ' atom coordinates changed!'    
+        print len(bad_list), ' atom coordinates changed!'
         for a in bad_list:
             print a.name, ":", coord_dict[a], ' -> ', a.coords
     else:
-        if verbose: print "No change in atomic coordinates"
-    if mol.returnCode!=0: 
+        if verbose:
+            print "No change in atomic coordinates"
+    if mol.returnCode != 0:
         sys.stderr.write(mol.returnMsg+"\n")
     sys.exit(mol.returnCode)
 
 
 # To execute this command type:
 # prepare_ligand4.py -l pdb_file -v
-
-
-
-
